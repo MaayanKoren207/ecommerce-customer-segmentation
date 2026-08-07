@@ -1,0 +1,5 @@
+cluster_id,segment,RECENCY,FREQUENCY,MONETARY,customers,recommended_action
+0,High-Value Repeat Customers,156.26053639846742,9.076628352490422,406.5772030651341,261,"Retention, loyalty recognition, cross-sell and selective upsell."
+1,Frequent Low-Spend Customers,213.4848484848485,9.662878787878787,160.7132196969697,264,"Increase average order value with bundles, cross-sell and threshold-based offers."
+2,Lapsed High-Spend Customers,278.2566371681416,4.393805309734513,328.4990265486726,226,Prioritize win-back and re-engagement campaigns; investigate reasons for inactivity.
+3,Recent Occasional Customers,99.18875502008032,4.144578313253012,209.9524497991968,249,Nurture repeat purchasing with onboarding-style journeys and second-purchase incentives.

@@ -1,0 +1,2 @@
+model,k,inertia,silhouette,davies_bouldin,ari_mean,ari_std,chi2_p_purchase_intent,chi2_p_customer_satisfaction
+KMeans — RFM only (final),4,115.90990934011602,0.28919392884037587,1.128242914764511,0.9798990958685503,0.011835761048823472,0.7951887058112096,0.9142738187800632
