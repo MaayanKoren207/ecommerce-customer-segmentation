@@ -1,33 +1,35 @@
 # E-commerce Customer Segmentation with RFM
 
-A portfolio-ready customer-segmentation project using **RFM (Recency, Frequency, Monetary) analysis** and **K-Means clustering** to identify actionable e-commerce customer groups.
+Customer segmentation using **RFM (Recency, Frequency, Monetary) analysis** and **K-Means clustering** to identify distinct purchasing-value profiles and translate them into targeted customer strategies.
 
-The original academic workflow explored several alternatives — broader K-Means feature sets, sensitivity analysis, Isolation Forest, K-Prototypes, and GMM + PCA — before converging on a simpler and more interpretable **RFM-only K-Means model with K=4**.
+## Business objective
 
-## Business question
+The goal is to group customers according to purchasing value and timing so that different segments can support decisions around retention, re-engagement, cross-sell, upsell, average order value and repeat-purchase activation.
 
-How can an e-commerce business group customers by purchasing value and engagement pattern so that retention, re-engagement, cross-sell and upsell actions can be targeted more effectively?
+## Modeling approach
 
-## Why RFM was selected
+The analysis evaluated multiple representations before selecting the final model:
 
-The exploratory models showed that broader feature sets could be driven by operational variables such as discount usage and loyalty-program membership. The final design therefore focuses the clustering itself on three direct behavioral/value signals:
+1. broader behavioral K-Means feature sets;
+2. sensitivity analysis around discount and loyalty variables;
+3. Isolation Forest as an outlier diagnostic;
+4. probabilistic clustering with GMM after PCA;
+5. final **RFM-only K-Means** segmentation.
 
-- **Recency** — days since the customer's recorded purchase
-- **Frequency** — purchase frequency
-- **Monetary** — purchase amount
+The final model uses RFM because it produced the clearest combination of interpretability, quantitative separation and stability.
 
-Demographic, operational and label-like fields are used only for post-cluster profiling or validation.
+For the full modeling path, see [`notebooks/exploratory_modeling.ipynb`](notebooks/exploratory_modeling.ipynb).
 
 ## Dataset
 
 The repository uses the public **Ecommerce Consumer Behavior Analysis Data** dataset from Kaggle:
 
-- 1,000 customers
-- 28 fields
-- purchase behavior, demographics, engagement, loyalty, satisfaction and purchase-intent variables
+- **1,000 customers**
+- **28 variables**
+- demographics, purchase behavior, engagement, loyalty, satisfaction and purchase-intent fields
 - license: **CC BY 4.0**
 
-See [`DATASET.md`](DATASET.md) for source attribution and usage notes.
+See [`DATASET.md`](DATASET.md) for attribution and usage details.
 
 ## Final model
 
@@ -40,60 +42,47 @@ See [`DATASET.md`](DATASET.md) for source attribution and usage notes.
 | Mean pairwise ARI across seeds | **0.980** |
 | Customers | **1,000** |
 
-The silhouette curve peaks at **K=4** in the evaluated 2–8 range. The high ARI indicates that the final RFM segmentation is stable across the tested random seeds.
+The evaluated silhouette curve peaks at **K=4**.
 
 ![Silhouette analysis](assets/kmeans_silhouette.png)
 
 ## Customer segments
 
-| Segment | Customers | Avg. recency (days) | Avg. frequency | Avg. monetary | Business interpretation |
+| Segment | Customers | Avg. recency | Avg. frequency | Avg. monetary | Recommended action |
 |---|---:|---:|---:|---:|---|
-| **High-Value Repeat Customers** | 261 | 156.3 | 9.1 | $406.58 | Retention, loyalty recognition, cross-sell and selective upsell. |
-| **Frequent Low-Spend Customers** | 264 | 213.5 | 9.7 | $160.71 | Increase average order value with bundles, cross-sell and threshold-based offers. |
-| **Lapsed High-Spend Customers** | 226 | 278.3 | 4.4 | $328.50 | Prioritize win-back and re-engagement campaigns; investigate reasons for inactivity. |
-| **Recent Occasional Customers** | 249 | 99.2 | 4.1 | $209.95 | Nurture repeat purchasing with onboarding-style journeys and second-purchase incentives. |
+| **High-Value Repeat Customers** | 261 | 156.3 days | 9.1 | $406.58 | Retention, loyalty recognition, cross-sell and selective upsell. |
+| **Frequent Low-Spend Customers** | 264 | 213.5 days | 9.7 | $160.71 | Increase basket size with bundles, cross-sell and spend-threshold offers. |
+| **Lapsed High-Spend Customers** | 226 | 278.3 days | 4.4 | $328.50 | Win-back and re-engagement; investigate the reasons for inactivity. |
+| **Recent Occasional Customers** | 249 | 99.2 days | 4.1 | $209.95 | Encourage the next purchase and build repeat behavior. |
 
 ![RFM profiles](assets/rfm_profile.png)
 
-### 1. High-Value Repeat Customers
-High purchase frequency and the highest monetary value, with mid-range recency.  
-**Action:** protect retention, recognize loyalty, and prioritize relevant cross-sell/upsell.
+### High-Value Repeat Customers
+High purchase frequency and the highest average monetary value.  
+**Focus:** retention, loyalty recognition, relevant cross-sell and selective upsell.
 
-### 2. Frequent Low-Spend Customers
-The highest purchase frequency but the lowest average monetary value.  
-**Action:** focus on increasing basket size through bundles, cross-sell and spend-threshold mechanics.
+### Frequent Low-Spend Customers
+Very frequent purchasing but the lowest average monetary value.  
+**Focus:** increase basket size through bundles, complementary products and spend-threshold mechanics.
 
-### 3. Lapsed High-Spend Customers
-Relatively high historical monetary value but the oldest average recency and lower frequency.  
-**Action:** prioritize win-back and re-engagement; investigate why valuable customers became inactive.
+### Lapsed High-Spend Customers
+Meaningful historical spend but the oldest average recency and lower purchase frequency.  
+**Focus:** win-back and re-engagement.
 
-### 4. Recent Occasional Customers
-The most recent purchases but relatively low frequency and moderate spend.  
-**Action:** nurture a second/next purchase and build repeat behavior.
+### Recent Occasional Customers
+The most recent purchases but relatively low purchase frequency.  
+**Focus:** encourage the next purchase and build repeat behavior.
 
-> These marketing actions are analytical recommendations derived from the RFM profiles; they were not tested as causal interventions.
+> Recommended actions are derived from the segment profiles and were not tested as causal interventions.
 
-## Post-hoc checks
+## Post-hoc validation
 
-`Customer_Satisfaction` and `Purchase_Intent` were intentionally excluded from clustering and examined only afterward. In this dataset, chi-square tests did **not** show a significant association between RFM cluster membership and either variable:
+`Customer_Satisfaction` and `Purchase_Intent` were excluded from clustering and analyzed only after the segments were formed.
 
-- Purchase Intent p-value: **0.795**
-- Customer Satisfaction p-value: **0.914**
+- Purchase Intent chi-square p-value: **0.795**
+- Customer Satisfaction chi-square p-value: **0.914**
 
-This is a useful finding rather than a failure: the final segmentation captures **purchase timing, frequency and economic value**, not every dimension of customer attitude or intent.
-
-## Model-development path
-
-The original project tested several alternatives before selecting the final model:
-
-1. **Broader K-Means feature set** — more behavioral/operational variables, but weaker geometric separation.
-2. **Sensitivity analysis** — removing dominant discount and loyalty variables materially changed the cluster structure.
-3. **Isolation Forest** — no evidence that a small extreme-outlier population explained the clustering behavior.
-4. **K-Prototypes** — tested because the source data mixes numerical and categorical features; stability remained limited in the original experiment.
-5. **GMM + PCA** — useful as a soft-clustering comparison, but model-selection criteria favored a more granular structure than was desirable for a practical marketing segmentation.
-6. **RFM + K-Means** — selected for interpretability, stability and direct alignment with customer-value segmentation.
-
-The repository keeps the final pipeline concise while preserving selected comparison logic in [`src/model_comparison.py`](src/model_comparison.py).
+The lack of significant association suggests that the RFM clusters primarily capture **transaction value and timing**, rather than all attitudinal dimensions in the source data.
 
 ## Repository structure
 
@@ -103,11 +92,11 @@ ecommerce-customer-segmentation/
 ├── DATASET.md
 ├── LICENSE
 ├── requirements.txt
-├── .gitignore
 ├── data/
 │   └── ecommerce_consumer_behavior.csv
 ├── notebooks/
-│   └── ecommerce_customer_segmentation.ipynb
+│   ├── ecommerce_customer_segmentation.ipynb
+│   └── exploratory_modeling.ipynb
 ├── src/
 │   ├── customer_segmentation.py
 │   └── model_comparison.py
@@ -135,25 +124,21 @@ pip install -r requirements.txt
 python src/customer_segmentation.py
 ```
 
-## Key methodological choices
+## Methodological choices
 
-- Removed technical IDs from modeling.
-- Converted purchase amount to a numeric feature.
-- Used a fixed reference date (`2024-12-31`) to reproduce Recency.
-- Used Min-Max scaling so R, F and M contribute on comparable scales.
-- Chose `K=4` using Elbow/Silhouette analysis plus business interpretability.
-- Tested stability across multiple random seeds using Adjusted Rand Index.
-- Kept satisfaction and purchase intent out of clustering to avoid label leakage.
-- Used demographics and additional behavioral variables for interpretation, not to define the final RFM clusters.
+- Technical identifiers are excluded from modeling.
+- Purchase amount is converted from currency text to numeric.
+- Recency uses a fixed observation date (`2024-12-31`) for reproducibility.
+- RFM features are Min-Max scaled before K-Means.
+- `K=4` is selected using internal metrics and interpretability.
+- Stability is tested across multiple random seeds using Adjusted Rand Index.
+- Satisfaction and purchase intent are held out from cluster formation.
+- Demographic and additional behavioral fields are used for profiling rather than defining the final RFM segments.
 
 ## Limitations
 
-- The dataset contains only 1,000 records and is a public analytical dataset rather than a live production customer table.
-- The fixed Recency reference date is appropriate for reproducing this project, but a production pipeline would use a dynamic observation date.
-- RFM is intentionally simple and does not capture product-level, channel-level or attitudinal behavior.
-- Cluster labels are descriptive analytical constructs, not ground-truth customer classes.
-- Marketing recommendations should be validated through experimentation before operational use.
-
-## Portfolio takeaway
-
-The main value of this project is not simply fitting K-Means. It demonstrates an iterative modeling process: detecting when richer feature sets create less useful segmentation, comparing alternative clustering approaches, narrowing the model to a stable and interpretable behavioral core, and translating the resulting segments into concrete business actions.
+- The dataset contains 1,000 records and is not a live production customer table.
+- The fixed Recency reference date is useful for reproducibility; a production system would use a dynamic observation date.
+- RFM intentionally omits product-, channel- and attitude-level behavior from the final clustering space.
+- Cluster names are descriptive interpretations, not ground-truth classes.
+- Recommended marketing actions require experimental validation before deployment.
